@@ -1,0 +1,2 @@
+This is a legitimate benign text document created for testing the Hawk Threat Scanner.
+No threats, exploits, or malicious code are present in this document.

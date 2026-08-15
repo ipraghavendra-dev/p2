@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: hawk-threat-scanner
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: VIRUSTOTAL_API_KEY
+        sync: false
+      - key: RATE_LIMIT_CPM
+        value: 4
+      - key: COOLDOWN_WINDOW
+        value: 60

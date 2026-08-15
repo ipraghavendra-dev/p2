@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  aegis-scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aegis_threat_scanner
+    ports:
+      - "8000:8000"
+    environment:
+      - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY:-}
+      - DATABASE_URL=sqlite:///./threat_cache.db
+      - RATE_LIMIT_CPM=4
+      - COOLDOWN_WINDOW=60
+    volumes:
+      - aegis_data:/app
+    restart: unless-stopped
+
+volumes:
+  aegis_data:
