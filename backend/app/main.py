@@ -109,7 +109,7 @@ def _format_cached_record(cached: ThreatCache) -> Dict[str, Any]:
     }
 
 
-def process_hash_query(clean_hash: str, file_name: Optional[str] = None) -> Dict[str, Any]:
+def process_hash_query(clean_hash: str, file_name: Optional[str] = None, client_id: str = "global") -> Dict[str, Any]:
     """Core logic to lookup, query VirusTotal, or fallback to heuristics for file hashes."""
     with Session(engine) as session:
         # 1. Check local database cache
@@ -118,6 +118,8 @@ def process_hash_query(clean_hash: str, file_name: Optional[str] = None) -> Dict
             cached.scanned_at = time.time()
             if file_name and not cached.file_name:
                 cached.file_name = file_name
+            if client_id and client_id != "global":
+                cached.client_id = client_id
             session.add(cached)
             session.commit()
             session.refresh(cached)
@@ -129,7 +131,6 @@ def process_hash_query(clean_hash: str, file_name: Optional[str] = None) -> Dict
                 "message": "Retrieved from high-speed local database cache.",
                 "data": formatted_data
             }
-
 
         # 2. Query VirusTotal Live API if key is present
         vt_data = fetch_from_virustotal(clean_hash)
@@ -191,6 +192,7 @@ def process_hash_query(clean_hash: str, file_name: Optional[str] = None) -> Dict
             new_cache = ThreatCache(
                 file_hash=clean_hash,
                 file_name=payload_dict["file_name"],
+                client_id=client_id,
                 risk_percentage=risk_pct,
                 malicious_count=malicious,
                 suspicious_count=suspicious,
@@ -217,6 +219,7 @@ def process_hash_query(clean_hash: str, file_name: Optional[str] = None) -> Dict
         new_cache = ThreatCache(
             file_hash=clean_hash,
             file_name=fallback_res["file_name"],
+            client_id=client_id,
             risk_percentage=fallback_res["risk_percentage"],
             malicious_count=fallback_res["malicious_count"],
             suspicious_count=fallback_res["suspicious_count"],
@@ -239,7 +242,7 @@ def process_hash_query(clean_hash: str, file_name: Optional[str] = None) -> Dict
         }
 
 
-def process_url_query(target_url: str) -> Dict[str, Any]:
+def process_url_query(target_url: str, client_id: str = "global") -> Dict[str, Any]:
     """Core logic to inspect URLs, query VirusTotal URL endpoint, or evaluate heuristic indicators."""
     clean_url = target_url.strip()
     if not clean_url.startswith(("http://", "https://")):
@@ -250,6 +253,8 @@ def process_url_query(target_url: str) -> Dict[str, Any]:
         cached = session.get(ThreatCache, clean_url)
         if cached:
             cached.scanned_at = time.time()
+            if client_id and client_id != "global":
+                cached.client_id = client_id
             session.add(cached)
             session.commit()
             session.refresh(cached)
@@ -261,7 +266,6 @@ def process_url_query(target_url: str) -> Dict[str, Any]:
                 "message": "Retrieved URL intelligence from database cache.",
                 "data": formatted_data
             }
-
 
         # 2. Check VirusTotal URL Live API
         vt_data = fetch_url_from_virustotal(clean_url)
@@ -329,6 +333,7 @@ def process_url_query(target_url: str) -> Dict[str, Any]:
             new_cache = ThreatCache(
                 file_hash=clean_url,
                 file_name=clean_url,
+                client_id=client_id,
                 risk_percentage=risk_pct,
                 malicious_count=malicious,
                 suspicious_count=suspicious,
@@ -355,6 +360,7 @@ def process_url_query(target_url: str) -> Dict[str, Any]:
         new_cache = ThreatCache(
             file_hash=clean_url,
             file_name=clean_url,
+            client_id=client_id,
             risk_percentage=url_res["risk_percentage"],
             malicious_count=url_res["malicious_count"],
             suspicious_count=url_res["suspicious_count"],
@@ -375,6 +381,7 @@ def process_url_query(target_url: str) -> Dict[str, Any]:
             "message": "URL analyzed via Hawk heuristics & threat registry.",
             "data": url_res
         }
+
 
 
 
