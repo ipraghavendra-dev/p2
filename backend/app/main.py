@@ -3,10 +3,11 @@ import time
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, File, HTTPException, Body, Query, status
+from fastapi import FastAPI, UploadFile, File, HTTPException, Body, Query, Header, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
+
 from sqlmodel import SQLModel, create_engine, Session, select, desc
 
 from .config import DATABASE_URL, FRONTEND_DIR, is_vt_configured, VT_API_KEY
