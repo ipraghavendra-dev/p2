@@ -114,11 +114,12 @@ def process_hash_query(clean_hash: str, file_name: Optional[str] = None) -> Dict
         # 1. Check local database cache
         cached = session.get(ThreatCache, clean_hash)
         if cached:
+            cached.scanned_at = time.time()
             if file_name and not cached.file_name:
                 cached.file_name = file_name
-                session.add(cached)
-                session.commit()
-                session.refresh(cached)
+            session.add(cached)
+            session.commit()
+            session.refresh(cached)
 
             formatted_data = _format_cached_record(cached)
             return {
@@ -127,6 +128,7 @@ def process_hash_query(clean_hash: str, file_name: Optional[str] = None) -> Dict
                 "message": "Retrieved from high-speed local database cache.",
                 "data": formatted_data
             }
+
 
         # 2. Query VirusTotal Live API if key is present
         vt_data = fetch_from_virustotal(clean_hash)
@@ -246,6 +248,11 @@ def process_url_query(target_url: str) -> Dict[str, Any]:
         # 1. Check database cache
         cached = session.get(ThreatCache, clean_url)
         if cached:
+            cached.scanned_at = time.time()
+            session.add(cached)
+            session.commit()
+            session.refresh(cached)
+
             formatted_data = _format_cached_record(cached)
             return {
                 "source": "local_database_cache",
@@ -253,6 +260,7 @@ def process_url_query(target_url: str) -> Dict[str, Any]:
                 "message": "Retrieved URL intelligence from database cache.",
                 "data": formatted_data
             }
+
 
         # 2. Check VirusTotal URL Live API
         vt_data = fetch_url_from_virustotal(clean_url)
@@ -437,13 +445,41 @@ async def scan_url(payload: Optional[Dict[str, Any]] = Body(None), url: Optional
 @app.post("/scan/file")
 @app.post("/api/scan/file")
 async def scan_file(file: UploadFile = File(...)):
-    """Accepts file uploads, inspects binary payload, hashes in memory, and returns threat telemetry."""
+    """Accepts file uploads, inspects binary payload, hashes in memory, logs to database, and returns threat telemetry."""
     try:
         contents = await file.read()
         if not contents:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded file is empty (0 bytes).")
 
         result = evaluate_file_payload(contents, file.filename or "Uploaded_Artifact")
+        
+        # Save file scan into database so it is tracked in fresh activity logs
+        with Session(engine) as session:
+            file_hash = result["file_hash"]
+            cached = session.get(ThreatCache, file_hash)
+            if cached:
+                cached.scanned_at = time.time()
+                cached.file_name = file.filename or cached.file_name
+                cached.engine_details = json.dumps(result)
+                session.add(cached)
+            else:
+                new_cache = ThreatCache(
+                    file_hash=file_hash,
+                    file_name=file.filename or result["file_name"],
+                    risk_percentage=result["risk_percentage"],
+                    malicious_count=result["malicious_count"],
+                    suspicious_count=result["suspicious_count"],
+                    harmless_count=result["harmless_count"],
+                    undetected_count=result["undetected_count"],
+                    total_engines=result["total_engines"],
+                    verdict=result["verdict"],
+                    threat_category=result["threat_category"],
+                    engine_details=json.dumps(result),
+                    scanned_at=time.time()
+                )
+                session.add(new_cache)
+            session.commit()
+
         return {
             "source": result["source"],
             "status": "success",
@@ -459,12 +495,26 @@ async def scan_file(file: UploadFile = File(...)):
 
 
 @app.get("/api/recent")
+@app.get("/api/history")
 def get_recent_scans():
-    """Fetches recently scanned artifacts and links from the cache."""
+    """Fetches recently scanned artifacts and links from the database with full refreshed telemetry."""
     with Session(engine) as session:
-        statement = select(ThreatCache).order_by(desc(ThreatCache.scanned_at)).limit(10)
+        statement = select(ThreatCache).order_by(desc(ThreatCache.scanned_at)).limit(20)
         results = session.exec(statement).all()
-        return {"scans": results}
+        formatted = [_format_cached_record(r) for r in results]
+        return {"scans": formatted, "count": len(formatted)}
+
+
+@app.post("/api/history/clear")
+@app.delete("/api/history")
+def clear_scan_history():
+    """Clears all scan history logs from the database."""
+    with Session(engine) as session:
+        for item in session.exec(select(ThreatCache)).all():
+            session.delete(item)
+        session.commit()
+    return {"status": "success", "message": "Scan history cleared."}
+
 
 
 # ==========================================

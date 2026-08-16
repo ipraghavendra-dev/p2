@@ -105,6 +105,9 @@ const CIRCUMFERENCE = 2 * Math.PI * 58; // ~364.425
 document.addEventListener('DOMContentLoaded', () => {
     checkApiHealth();
     setupEventListeners();
+    if (typeof fetchScanHistory === 'function') {
+        fetchScanHistory();
+    }
 });
 
 // Tab Switching Mechanism
@@ -120,14 +123,21 @@ window.switchScannerTab = function(tab) {
     if (tab === 'url') {
         if (tabUrl) tabUrl.className = 'flex-1 py-2 px-3 text-xs font-semibold rounded-xl transition-all duration-200 bg-purple-600 text-white shadow-md shadow-purple-900/30';
         if (urlSection) urlSection.classList.remove('hidden');
+        if (urlInput) urlInput.focus();
     } else if (tab === 'hash') {
         if (tabHash) tabHash.className = 'flex-1 py-2 px-3 text-xs font-semibold rounded-xl transition-all duration-200 bg-blue-600 text-white shadow-md shadow-blue-900/30';
         if (hashSection) hashSection.classList.remove('hidden');
+        if (hashInput) hashInput.focus();
     } else if (tab === 'file') {
         if (tabFile) tabFile.className = 'flex-1 py-2 px-3 text-xs font-semibold rounded-xl transition-all duration-200 bg-emerald-600 text-white shadow-md shadow-emerald-900/30';
         if (fileSection) fileSection.classList.remove('hidden');
     }
+
+    if (typeof fetchScanHistory === 'function') {
+        fetchScanHistory();
+    }
 };
+
 
 // Setup Listeners
 function setupEventListeners() {
@@ -281,6 +291,7 @@ async function handleUrlScan(rawUrl) {
 
         const result = await response.json();
         renderMetrics(result, clean, 'url');
+        if (typeof fetchScanHistory === 'function') fetchScanHistory();
         showToast(`Scan complete: ${result.data?.verdict || 'Processed'}`, 'success');
     } catch (err) {
         console.error("URL scan error:", err);
@@ -314,6 +325,7 @@ async function handleFileUpload(file) {
 
         const result = await response.json();
         renderMetrics(result, file.name, 'file');
+        if (typeof fetchScanHistory === 'function') fetchScanHistory();
         showToast(`Scan completed for ${file.name}`, 'success');
     } catch (err) {
         console.error("Upload error:", err);
@@ -347,12 +359,14 @@ async function handleHashLookup(hash) {
 
         const result = await response.json();
         renderMetrics(result, null, 'hash');
+        if (typeof fetchScanHistory === 'function') fetchScanHistory();
         showToast('Hash intelligence report ready.', 'success');
     } catch (err) {
         console.error("Hash lookup error:", err);
         showToast(err.message || 'Failed to analyze hash.', 'error');
     } finally {
         toggleUIState(false);
+
     }
 }
 
@@ -624,3 +638,165 @@ function showToast(message, type = 'info') {
     toast.querySelector('button').addEventListener('click', dismiss);
     setTimeout(dismiss, 4000);
 }
+
+// ==========================================
+// Live Scan Activity & Audit Log Manager
+// ==========================================
+let cachedScansList = [];
+let activeHistoryFilter = 'all';
+
+function formatTimestamp(epochSec) {
+    if (!epochSec) return 'Just now';
+    const diff = Math.floor(Date.now() / 1000 - epochSec);
+    if (diff < 15) return 'Just now';
+    if (diff < 60) return `${diff}s ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return new Date(epochSec * 1000).toLocaleDateString();
+}
+
+function detectScanType(scan) {
+    const target = scan.file_hash || scan.file_name || '';
+    if (target.startsWith('http://') || target.startsWith('https://') || (target.includes('.') && !target.includes(' '))) {
+        if (target.includes('/') || target.endsWith('.com') || target.endsWith('.org') || target.endsWith('.net') || target.endsWith('.xyz') || target.endsWith('.io')) {
+            return 'url';
+        }
+    }
+    if (/^[a-fA-F0-9]{32,64}$/.test(target)) {
+        return 'hash';
+    }
+    return 'file';
+}
+
+window.fetchScanHistory = async function() {
+    try {
+        const response = await fetch(`${BACKEND_BASE}/api/history`);
+        if (!response.ok) return;
+        const res = await response.json();
+        cachedScansList = res.scans || [];
+        renderScanHistory();
+    } catch (err) {
+        console.warn('Failed to fetch scan history:', err);
+    }
+};
+
+window.filterHistory = function(filterType) {
+    activeHistoryFilter = filterType;
+    ['filterAll', 'filterUrl', 'filterHash', 'filterFile'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.className = 'px-3 py-1 text-xs font-semibold rounded-lg bg-gray-900/80 hover:bg-gray-800 text-gray-400 hover:text-white border border-gray-800 transition';
+        }
+    });
+
+    const activeBtn = document.getElementById('filter' + filterType.charAt(0).toUpperCase() + filterType.slice(1));
+    if (activeBtn) {
+        activeBtn.className = 'px-3 py-1 text-xs font-semibold rounded-lg bg-purple-600 text-white transition shadow-sm';
+    }
+
+    renderScanHistory();
+};
+
+window.clearScanHistory = async function() {
+    try {
+        const response = await fetch(`${BACKEND_BASE}/api/history/clear`, { method: 'POST' });
+        if (response.ok) {
+            cachedScansList = [];
+            renderScanHistory();
+            showToast('Scan history logs cleared.', 'info');
+        }
+    } catch {
+        cachedScansList = [];
+        renderScanHistory();
+    }
+};
+
+window.viewHistoryRecord = function(index) {
+    const item = cachedScansList[index];
+    if (!item) return;
+    const type = detectScanType(item);
+    renderMetrics(item, item.file_name || item.file_hash, type);
+    showToast(`Loaded forensic report for ${item.file_name || item.file_hash}`, 'info');
+};
+
+function renderScanHistory() {
+    const container = document.getElementById('historyList');
+    if (!container) return;
+
+    let urlCount = 0, hashCount = 0, fileCount = 0;
+    cachedScansList.forEach(s => {
+        const t = detectScanType(s);
+        if (t === 'url') urlCount++;
+        else if (t === 'hash') hashCount++;
+        else fileCount++;
+    });
+
+    const countAllEl = document.getElementById('countAll');
+    const countUrlEl = document.getElementById('countUrl');
+    const countHashEl = document.getElementById('countHash');
+    const countFileEl = document.getElementById('countFile');
+
+    if (countAllEl) countAllEl.innerText = cachedScansList.length;
+    if (countUrlEl) countUrlEl.innerText = urlCount;
+    if (countHashEl) countHashEl.innerText = hashCount;
+    if (countFileEl) countFileEl.innerText = fileCount;
+
+    const filtered = cachedScansList.filter(s => {
+        if (activeHistoryFilter === 'all') return true;
+        return detectScanType(s) === activeHistoryFilter;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-xs text-gray-500 border border-dashed border-gray-800/80 rounded-xl">
+                No logs recorded for this category yet. Run a check above to log new activity.
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = filtered.map((item) => {
+        const originalIndex = cachedScansList.indexOf(item);
+        const type = detectScanType(item);
+        const typeIcon = type === 'url' ? '🌐' : (type === 'file' ? '📁' : '🔑');
+        const verdict = (item.verdict || 'CLEAN').toUpperCase();
+        const isBad = verdict === 'MALICIOUS';
+        const isSusp = verdict === 'SUSPICIOUS';
+
+        let badgeClass = 'bg-emerald-950/60 text-emerald-400 border-emerald-800/40';
+        if (isBad) badgeClass = 'bg-red-950/60 text-red-400 border-red-800/40';
+        else if (isSusp) badgeClass = 'bg-amber-950/60 text-amber-400 border-amber-800/40';
+
+        const riskScore = item.fraud_score !== undefined ? item.fraud_score : Math.round(item.risk_percentage || 0);
+        const timeAgo = formatTimestamp(item.scanned_at);
+        const targetLabel = item.file_name || item.file_hash || 'Unknown Target';
+
+        return `
+            <div class="bg-gray-950/90 border border-gray-800/80 hover:border-gray-700/80 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition">
+                <div class="flex items-center space-x-3 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-center text-sm shrink-0">
+                        ${typeIcon}
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-gray-200 truncate font-mono">${targetLabel}</p>
+                        <div class="flex items-center gap-2 mt-0.5 text-[11px] text-gray-500">
+                            <span>${item.threat_category || 'General Telemetry'}</span>
+                            <span>&bull;</span>
+                            <span>${timeAgo}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between sm:justify-end space-x-2.5 shrink-0">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded border ${badgeClass}">
+                        ${verdict} (${riskScore}%)
+                    </span>
+                    <button type="button" onclick="viewHistoryRecord(${originalIndex})" 
+                            class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-700/60 transition">
+                        View Report &rarr;
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
