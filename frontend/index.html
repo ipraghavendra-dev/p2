@@ -205,9 +205,15 @@
                             </button>
                         </div>
                     </div>
-                    <span id="resSourceBadge" class="text-xs self-start sm:self-center font-semibold bg-purple-950/80 text-purple-400 border border-purple-800/50 px-3.5 py-1.5 rounded-full shadow-inner">
-                        Hawk Threat Engine
-                    </span>
+                    <div class="flex items-center gap-2 self-start sm:self-center">
+                        <button type="button" onclick="downloadReport()" title="Download Detailed Threat Report"
+                                class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-950/60 hover:bg-blue-900/80 text-blue-300 border border-blue-800/50 transition flex items-center gap-1.5 shadow-sm">
+                            📥 Download Report
+                        </button>
+                        <span id="resSourceBadge" class="text-xs font-semibold bg-purple-950/80 text-purple-400 border border-purple-800/50 px-3.5 py-1.5 rounded-full shadow-inner">
+                            Hawk Threat Engine
+                        </span>
+                    </div>
                 </div>
 
 
@@ -396,6 +402,10 @@
                     <p class="text-xs text-gray-400">Real-time audit stream of all analyzed URLs, hashes, and binary payloads.</p>
                 </div>
                 <div class="flex items-center space-x-2">
+                    <button type="button" onclick="downloadReport()" title="Download Full Threat Audit Report"
+                            class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-950/60 hover:bg-blue-900/80 text-blue-300 border border-blue-800/50 transition flex items-center gap-1.5 shadow-sm">
+                        📥 Download Report
+                    </button>
                     <button type="button" onclick="fetchScanHistory()" title="Refresh Logs"
                             class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-900/90 hover:bg-gray-800 text-gray-300 border border-gray-800 transition flex items-center gap-1">
                         🔄 Refresh

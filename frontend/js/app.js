@@ -101,6 +101,15 @@ const forensicContentType = document.getElementById('forensicContentType');
 // SVG Circumference Constant (r = 58)
 const CIRCUMFERENCE = 2 * Math.PI * 58; // ~364.425
 
+// Tab & Report State Management
+let currentActiveTab = 'url';
+const tabReports = {
+    url: null,
+    hash: null,
+    file: null
+};
+let lastLoadedReport = null;
+
 // Initialize Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     checkApiHealth();
@@ -110,8 +119,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Tab Switching Mechanism
+// Tab Switching Mechanism (Isolates Reports Per Tab)
 window.switchScannerTab = function(tab) {
+    currentActiveTab = tab;
+
     [tabUrl, tabHash, tabFile].forEach(t => {
         if (t) t.className = 'flex-1 py-2 px-3 text-xs font-semibold rounded-xl transition-all duration-200 text-gray-400 hover:text-white';
     });
@@ -133,10 +144,19 @@ window.switchScannerTab = function(tab) {
         if (fileSection) fileSection.classList.remove('hidden');
     }
 
+    // Isolate Reports: Only display a report if one exists specifically for this active tab
+    if (tabReports[tab]) {
+        renderMetrics(tabReports[tab].payload, tabReports[tab].target, tabReports[tab].type, false);
+    } else {
+        if (resultsSection) resultsSection.classList.add('hidden');
+        lastLoadedReport = null;
+    }
+
     if (typeof fetchScanHistory === 'function') {
         fetchScanHistory();
     }
 };
+
 
 
 // Setup Listeners
@@ -276,7 +296,6 @@ async function handleUrlScan(rawUrl) {
 
     toggleUIState(true, `Running deep forensic threat & blacklist checks on ${clean}...`);
 
-
     try {
         const response = await fetch(`${BACKEND_BASE}/scan/url`, {
             method: 'POST',
@@ -290,7 +309,8 @@ async function handleUrlScan(rawUrl) {
         }
 
         const result = await response.json();
-        renderMetrics(result, clean, 'url');
+        tabReports['url'] = { payload: result, target: clean, type: 'url' };
+        renderMetrics(result, clean, 'url', true);
         if (typeof fetchScanHistory === 'function') fetchScanHistory();
         showToast(`Scan complete: ${result.data?.verdict || 'Processed'}`, 'success');
     } catch (err) {
@@ -324,7 +344,8 @@ async function handleFileUpload(file) {
         }
 
         const result = await response.json();
-        renderMetrics(result, file.name, 'file');
+        tabReports['file'] = { payload: result, target: file.name, type: 'file' };
+        renderMetrics(result, file.name, 'file', true);
         if (typeof fetchScanHistory === 'function') fetchScanHistory();
         showToast(`Scan completed for ${file.name}`, 'success');
     } catch (err) {
@@ -358,7 +379,8 @@ async function handleHashLookup(hash) {
         }
 
         const result = await response.json();
-        renderMetrics(result, null, 'hash');
+        tabReports['hash'] = { payload: result, target: null, type: 'hash' };
+        renderMetrics(result, null, 'hash', true);
         if (typeof fetchScanHistory === 'function') fetchScanHistory();
         showToast('Hash intelligence report ready.', 'success');
     } catch (err) {
@@ -366,7 +388,6 @@ async function handleHashLookup(hash) {
         showToast(err.message || 'Failed to analyze hash.', 'error');
     } finally {
         toggleUIState(false);
-
     }
 }
 
@@ -383,7 +404,7 @@ function setSignalBadge(el, isThreat, threatLabel = 'Detected', cleanLabel = 'Cl
 }
 
 // Render Results Dashboard (Unified for URLs, Hashes, and Files)
-function renderMetrics(payload, customTargetName = null, scanType = 'hash') {
+function renderMetrics(payload, customTargetName = null, scanType = 'hash', shouldScroll = true) {
     const data = payload.data || payload;
     if (!data) {
         showToast('No telemetry data available for this query.', 'warning');
@@ -399,6 +420,21 @@ function renderMetrics(payload, customTargetName = null, scanType = 'hash') {
     const total = data.total_engines || (malicious + suspicious + 68) || 70;
     const verdict = (data.verdict || (malicious > 0 ? 'MALICIOUS' : 'CLEAN')).toUpperCase();
     const source = payload.source || 'Hawk Threat Engine';
+
+    // Store active report reference for instant downloading
+    lastLoadedReport = {
+        scanType,
+        targetName,
+        targetVal,
+        riskPct: fraudScore,
+        malicious,
+        suspicious,
+        total,
+        verdict,
+        source,
+        data
+    };
+
 
     // Populate Headers
     if (resTargetIcon) {
@@ -593,8 +629,11 @@ function renderMetrics(payload, customTargetName = null, scanType = 'hash') {
 
     // Show Results Section
     resultsSection.classList.remove('hidden');
-    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (shouldScroll) {
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 }
+
 
 // Toast Alert Notification System
 function showToast(message, type = 'info') {
@@ -715,9 +754,12 @@ window.viewHistoryRecord = function(index) {
     const item = cachedScansList[index];
     if (!item) return;
     const type = detectScanType(item);
-    renderMetrics(item, item.file_name || item.file_hash, type);
+    window.switchScannerTab(type);
+    tabReports[type] = { payload: item, target: item.file_name || item.file_hash, type };
+    renderMetrics(item, item.file_name || item.file_hash, type, true);
     showToast(`Loaded forensic report for ${item.file_name || item.file_hash}`, 'info');
 };
+
 
 function renderScanHistory() {
     const container = document.getElementById('historyList');
@@ -799,4 +841,68 @@ function renderScanHistory() {
         `;
     }).join('');
 }
+
+// Download Comprehensive Threat / Audit Report Function
+window.downloadReport = function() {
+    // 1. If an active report is currently on screen, download that detailed forensic report
+    if (lastLoadedReport && lastLoadedReport.data) {
+        const reportData = {
+            scanner: "Hawk Threat Intelligence & Forensic Gateway",
+            report_id: `HTR-${Date.now()}`,
+            generated_at: new Date().toISOString(),
+            scan_type: lastLoadedReport.scanType,
+            target_name: lastLoadedReport.targetName,
+            target_identifier: lastLoadedReport.targetVal,
+            threat_verdict: lastLoadedReport.verdict,
+            risk_score_percentage: `${lastLoadedReport.riskPct}%`,
+            detection_engine_ratio: `${lastLoadedReport.malicious} / ${lastLoadedReport.total}`,
+            engine_source: lastLoadedReport.source,
+            threat_signals_matrix: lastLoadedReport.data.signals || {},
+            forensic_telemetry: lastLoadedReport.data.forensics || {},
+            detected_threat_vectors: lastLoadedReport.data.detected_vectors || [],
+            raw_payload_details: lastLoadedReport.data
+        };
+
+        const safeName = (lastLoadedReport.targetName || 'threat_report')
+            .replace(/[^a-zA-Z0-9_-]/g, '_')
+            .substring(0, 30);
+        
+        const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `hawk_report_${safeName}_${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Forensic report downloaded successfully!', 'success');
+        return;
+    }
+
+    // 2. Otherwise export the full audit log history
+    if (cachedScansList && cachedScansList.length > 0) {
+        const auditData = {
+            scanner: "Hawk Threat Intelligence Gateway",
+            export_title: "Hawk Threat Activity & Scan Audit Log",
+            export_timestamp: new Date().toISOString(),
+            total_records: cachedScansList.length,
+            records: cachedScansList
+        };
+
+        const blob = new Blob([JSON.stringify(auditData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `hawk_audit_logs_${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Audit log history downloaded successfully!', 'success');
+    } else {
+        showToast('No scan report or logs available to download. Please run a scan first.', 'warning');
+    }
+};
+
 
