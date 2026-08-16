@@ -13,9 +13,11 @@ if not exist "%GIT_PATH%" (
 )
 
 "%GIT_PATH%" add .
-"%GIT_PATH%" commit -m "feat: complete Hawk Threat Scanner fullstack application" 2>nul
+"%GIT_PATH%" commit -m "feat: update Hawk Threat Scanner deployment & codebase" 2>nul
+"%GIT_PATH%" pull --rebase origin main 2>nul
 "%GIT_PATH%" branch -M main
 "%GIT_PATH%" push -u origin main
+
 
 echo.
 echo ========================================================
