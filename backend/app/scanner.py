@@ -196,8 +196,18 @@ SAFE_ROOT_DOMAINS = {
 }
 
 
+def calculate_verdict(risk_percentage: float, detections: int = 0) -> Tuple[str, str]:
+    """Calculates threat verdict string and description based on risk score and detection count."""
+    if risk_percentage >= 50.0 or detections >= 5:
+        return "MALICIOUS", "Critical threat indicators detected."
+    elif risk_percentage > 10.0 or detections > 0:
+        return "SUSPICIOUS", "Suspicious behaviors or low vendor flags detected."
+    return "CLEAN", "No known threats detected."
+
+
 def calculate_sha256(file_bytes: bytes) -> str:
     return hashlib.sha256(file_bytes).hexdigest()
+
 
 def calculate_md5(file_bytes: bytes) -> str:
     return hashlib.md5(file_bytes).hexdigest()
