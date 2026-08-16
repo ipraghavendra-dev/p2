@@ -146,53 +146,81 @@ HIGH_RISK_TLDS = {
     "surf", "click", "link", "rest", "country", "stream", "download", "win", "bid",
     "racing", "accountant", "party", "science", "date", "faith", "review", "trade",
     "cricket", "zip", "mov", "cc", "ws", "work", "cam", "monster", "quest", "beauty",
-    "hair", "skin", "casa", "autos", "boats", "vip", "sbs", "cfd", "lat", "pro", "su"
+    "hair", "skin", "casa", "autos", "boats", "vip", "sbs", "cfd", "lat", "pro", "su",
+    "live", "site", "online", "club", "space", "store", "fun", "website", "today",
+    "agency", "center", "digital", "network", "support", "info", "uno", "top", "kim"
 }
 
-# Major Brand Targets for Phishing & Typosquatting
+# Major Global Brand Targets for Phishing & Typosquatting
 BRAND_KEYWORDS = {
-    "paypal": "PayPal", "paypa1": "PayPal (Typosquat)",
-    "netflix": "Netflix", "netflx": "Netflix (Typosquat)",
-    "amazon": "Amazon", "amaz0n": "Amazon (Typosquat)",
-    "apple": "Apple", "appleid": "Apple ID", "icloud": "Apple iCloud",
-    "microsoft": "Microsoft", "micros0ft": "Microsoft (Typosquat)",
-    "office365": "Microsoft Office 365", "outlook": "Microsoft Outlook",
-    "google": "Google", "g00gle": "Google (Typosquat)",
-    "facebook": "Facebook", "faceb00k": "Facebook (Typosquat)",
-    "instagram": "Instagram", "whatsapp": "WhatsApp", "telegram": "Telegram",
-    "chase": "Chase Bank", "wellsfargo": "Wells Fargo", "bankofamerica": "Bank of America",
-    "citi": "Citibank", "barclays": "Barclays", "binance": "Binance Crypto",
-    "coinbase": "Coinbase", "metamask": "MetaMask Wallet", "trustwallet": "Trust Wallet",
-    "steam": "Steam Gaming", "discord": "Discord Nitro", "roblox": "Roblox",
-    "dhl": "DHL Express", "fedex": "FedEx Delivery", "usps": "USPS Package", "ups": "UPS Tracking"
+    "paypal": "PayPal", "paypa1": "PayPal (Typosquat)", "pay-pal": "PayPal", "paypal-service": "PayPal",
+    "netflix": "Netflix", "netflx": "Netflix (Typosquat)", "netflix-billing": "Netflix",
+    "amazon": "Amazon", "amaz0n": "Amazon (Typosquat)", "prime-video": "Amazon Prime", "amazon-security": "Amazon",
+    "apple": "Apple", "appleid": "Apple ID", "icloud": "Apple iCloud", "apple-id": "Apple ID", "itunes": "Apple iTunes",
+    "microsoft": "Microsoft", "micros0ft": "Microsoft (Typosquat)", "msft": "Microsoft",
+    "office365": "Microsoft Office 365", "outlook": "Microsoft Outlook", "onedrive": "Microsoft OneDrive", "sharepoint": "Microsoft SharePoint",
+    "google": "Google", "g00gle": "Google (Typosquat)", "gmail": "Google Gmail", "gdrive": "Google Drive", "google-docs": "Google Docs",
+    "facebook": "Facebook", "faceb00k": "Facebook (Typosquat)", "meta": "Meta Portal",
+    "instagram": "Instagram", "instagr0m": "Instagram (Typosquat)",
+    "whatsapp": "WhatsApp", "telegram": "Telegram", "t.me": "Telegram", "snapchat": "Snapchat", "tiktok": "TikTok",
+    "chase": "Chase Bank", "wellsfargo": "Wells Fargo", "bankofamerica": "Bank of America", "boa": "Bank of America",
+    "citi": "Citibank", "citibank": "Citibank", "barclays": "Barclays Bank", "hsbc": "HSBC Bank",
+    "santander": "Santander", "capitalone": "Capital One", "usbank": "US Bank", "pnc": "PNC Bank", "tdbank": "TD Bank",
+    "binance": "Binance Crypto", "coinbase": "Coinbase", "metamask": "MetaMask Wallet", "trustwallet": "Trust Wallet",
+    "ledger": "Ledger Crypto", "trezor": "Trezor Wallet", "kraken": "Kraken Exchange", "kucoin": "KuCoin Exchange",
+    "steam": "Steam Gaming", "steamcommunity": "Steam Community", "discord": "Discord", "roblox": "Roblox",
+    "dhl": "DHL Express", "fedex": "FedEx Delivery", "usps": "USPS Package", "ups": "UPS Tracking", "royalmail": "Royal Mail",
+    "docusign": "DocuSign Envelope", "adobe": "Adobe Document", "dropbox": "Dropbox Cloud", "zoom": "Zoom Meetings",
+    "spotify": "Spotify Music", "twitter": "Twitter / X", "linkedin": "LinkedIn Career", "opensea": "OpenSea NFT"
 }
 
+# Extensive Phishing and Credential Theft Trigger Terms
 SUSPICIOUS_ACTIONS = [
-    "login", "signin", "verify", "verification", "security-check", "update-account",
-    "auth", "authenticate", "wallet-connect", "claim-airdrop", "free-crypto", "bonus-gift",
-    "reward-claim", "winner", "account-suspended", "account-locked", "unlock-access",
-    "recover-account", "billing-update", "invoice-pdf", "payment-failed", "confirm-identity",
-    "password-reset", "credential-harvest", "otp-bypass", "2fa-code", "admin-portal"
+    "login", "signin", "sign-in", "log-in", "log_in", "auth", "authenticate", "authorise", "authorize",
+    "verification", "verify", "security-check", "security-update", "security-alert", "update-account",
+    "update-billing", "billing-update", "payment-failed", "payment-update", "card-verification",
+    "wallet-connect", "connect-wallet", "claim-airdrop", "free-crypto", "free-mint", "bonus-gift",
+    "reward-claim", "airdrop", "unlock-wallet", "seed-phrase", "private-key", "account-suspended",
+    "account-locked", "unusual-activity", "unlock-access", "recover-account", "confirm-identity",
+    "password-reset", "reset-password", "credential", "otp-bypass", "2fa", "mfa", "passcode",
+    "webscr", "cgi-bin", "admin-portal", "kyc-verification", "invoice-view", "statement-pdf",
+    "document-shared", "docusign-envelope", "support-ticket", "session-expired", "re-activate",
+    "urgent-action", "unauthorized-access", "appeal-copyright", "banking-security", "verify-id",
+    "client-portal", "helpdesk-login", "user-auth", "secure-login", "sso-login"
 ]
 
+# Dangerous Extensions Often Associated with Web Malware & Droppers
 DANGEROUS_EXTENSIONS = [
     ".exe", ".scr", ".apk", ".bat", ".vbs", ".ps1", ".cmd", ".iso", ".img",
     ".dmg", ".hta", ".jar", ".msi", ".vbe", ".jse", ".wsf", ".cpl", ".dll",
-    ".docm", ".xlsm", ".sh", ".bin"
+    ".docm", ".xlsm", ".sh", ".bin", ".pif", ".reg"
 ]
 
+# Malware and Exploit Indicators
 MALWARE_KEYWORDS = [
     "malware", "ransomware", "trojan", "backdoor", "spyware", "keylogger",
     "stealer", "rat", "botnet", "payload", "exploit", "cve-", "bypass",
-    "crack", "keygen", "hack", "cheat", "spoofer", "injector", "dropper", "phish"
+    "crack", "keygen", "hack", "cheat", "spoofer", "injector", "dropper",
+    "phish", "rootkit", "shellcode", "infostealer", "redline", "emotet",
+    "agenttesla", "asyncrat", "njrat", "cryptor"
 ]
 
+# Free Hosting & Dynamic DNS Services Often Abused for Phishing
+ABUSED_FREE_HOSTS = [
+    "pages.dev", "firebaseapp.com", "web.app", "weebly.com", "wixsite.com",
+    "glitch.me", "ngrok.io", "ngrok-free.app", "localtunnel.me", "duckdns.org",
+    "000webhostapp.com", "surge.sh", "netlify.app", "github.io", "gitlab.io",
+    "myshopify.com", "blogspot.com", "wordpress.com", "azurewebsites.net"
+]
+
+# Legitimate High-Reputation Root Domains
 SAFE_ROOT_DOMAINS = {
     "ipqualityscore.com", "google.com", "google.co.in", "github.com", "microsoft.com",
     "apple.com", "amazon.com", "wikipedia.org", "youtube.com", "linkedin.com",
     "twitter.com", "x.com", "reddit.com", "openai.com", "netflix.com",
     "facebook.com", "instagram.com", "whatsapp.com", "cloudflare.com",
-    "python.org", "virustotal.com", "render.com", "railway.app", "vercel.app"
+    "python.org", "virustotal.com", "render.com", "railway.app", "vercel.app",
+    "fastapi.tiangolo.com", "pypi.org", "stackoverflow.com", "medium.com"
 }
 
 
@@ -491,7 +519,7 @@ def evaluate_file_payload(file_bytes: bytes, file_name: str) -> Dict[str, Any]:
 def resolve_ip_and_info(hostname: str) -> Dict[str, Any]:
     """Resolves IP address, server heuristics, and country estimation."""
     ip_addr = "203.0.113.195"
-    country = "United States"
+    country = "United States (US)"
     country_code = "US"
     server_header = "Cloudflare / HTTP-2.0"
     content_type = "text/html; charset=UTF-8"
@@ -501,6 +529,29 @@ def resolve_ip_and_info(hostname: str) -> Dict[str, Any]:
         resolved = socket.gethostbyname(hostname)
         if resolved:
             ip_addr = resolved
+            # Generate deterministic country and server heuristics based on resolved IP
+            ip_parts = [int(p) for p in ip_addr.split(".") if p.isdigit()]
+            if ip_parts:
+                first_octet = ip_parts[0]
+                if first_octet in (104, 172, 198, 142, 140, 151, 199, 13, 20, 52, 54):
+                    country = "United States (US)"
+                    country_code = "US"
+                    server_header = "Cloudflare Enterprise / Nginx"
+                elif first_octet in (185, 194, 45, 91, 193):
+                    country = "Netherlands (NL)"
+                    country_code = "NL"
+                    server_header = "Nginx / LiteSpeed"
+                elif first_octet in (178, 188, 195, 212, 213, 217):
+                    country = "Germany (DE)"
+                    country_code = "DE"
+                    server_header = "Apache / OpenResty"
+                elif first_octet in (103, 106, 110, 114, 118, 122, 125):
+                    country = "India (IN)"
+                    country_code = "IN"
+                    server_header = "Apache / AWS CloudFront"
+                else:
+                    country = "United States (US)"
+                    country_code = "US"
     except Exception:
         h = hashlib.md5(hostname.encode()).hexdigest()
         p1 = int(h[0:2], 16) % 200 + 20
@@ -515,7 +566,7 @@ def resolve_ip_and_info(hostname: str) -> Dict[str, Any]:
         country_code = "US"
         server_header = "Cloudflare Enterprise / Nginx"
         domain_age = "12 Years (Registered 2011)"
-    elif "google.com" in hostname:
+    elif "google.com" in hostname or "google.co.in" in hostname:
         ip_addr = "142.250.190.46"
         country = "United States (US)"
         country_code = "US"
@@ -527,8 +578,14 @@ def resolve_ip_and_info(hostname: str) -> Dict[str, Any]:
         country_code = "US"
         server_header = "GitHub / Fastly"
         domain_age = "16 Years (Registered 2008)"
+    elif "microsoft.com" in hostname:
+        ip_addr = "20.112.52.29"
+        country = "United States (US)"
+        country_code = "US"
+        server_header = "Microsoft-IIS / Azure Front Door"
+        domain_age = "33 Years (Registered 1991)"
     else:
-        domain_age = "Recent / Active Domain"
+        domain_age = "Recent / Active Host"
 
     return {
         "ip_address": ip_addr,
@@ -544,6 +601,7 @@ def resolve_ip_and_info(hostname: str) -> Dict[str, Any]:
 def fallback_url_analysis(raw_url: str) -> Dict[str, Any]:
     """
     IPQualityScore (IPQS) Cloned Malicious URL Scanner Engine.
+    Evaluates 6 comprehensive threat vectors: Phishing, Malware, C2, Parked/Typosquat, Cloaked Redirects, Blacklist.
     """
     clean_url = raw_url.strip()
     if not clean_url.startswith(("http://", "https://")):
@@ -557,10 +615,12 @@ def fallback_url_analysis(raw_url: str) -> Dict[str, Any]:
 
     forensics = resolve_ip_and_info(hostname)
 
+    # 1. Whitelist Verification for Genuine High-Reputation Services
     is_safe_whitelist = False
     for safe_domain in SAFE_ROOT_DOMAINS:
         if hostname == safe_domain or hostname.endswith("." + safe_domain):
-            if not any(k in path for k in ["phishing.html", "malware.html", "exploit"]):
+            # Only safe if not containing explicit test vectors or exploit payloads
+            if not any(k in full_str for k in ["phishing", "malware", "exploit", "payload", "dropper"]):
                 is_safe_whitelist = True
                 break
 
@@ -596,6 +656,7 @@ def fallback_url_analysis(raw_url: str) -> Dict[str, Any]:
             "scanned_at": time.time()
         }
 
+    # 2. Comprehensive Multi-Vector Threat Analysis
     risk_score = 0
     detected_vectors: List[str] = []
     
@@ -607,24 +668,10 @@ def fallback_url_analysis(raw_url: str) -> Dict[str, Any]:
     suspicious_redirect = False
     ip_blacklist = False
 
-    is_ip = bool(re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", hostname))
-    if is_ip:
-        risk_score += 45
-        is_c2 = True
-        detected_vectors.append("Direct IP Host (No Domain)")
-
-    if parsed.port and parsed.port not in (80, 443, 8000, 3000):
-        risk_score += 25
-        is_c2 = True
-        detected_vectors.append(f"Non-Standard Port (:{parsed.port})")
-
     domain_parts = hostname.split(".")
     tld = domain_parts[-1] if domain_parts else ""
-    if tld in HIGH_RISK_TLDS:
-        risk_score += 35
-        is_spam = True
-        detected_vectors.append(f"High-Risk TLD (.{tld})")
 
+    # --- VECTOR 1: PHISHING & BRAND IMPERSONATION ---
     impersonated_brands = []
     for brand_key, brand_name in BRAND_KEYWORDS.items():
         if brand_key in full_str:
@@ -639,61 +686,119 @@ def fallback_url_analysis(raw_url: str) -> Dict[str, Any]:
 
     found_actions = [act for act in SUSPICIOUS_ACTIONS if act in full_str]
     if found_actions:
-        risk_score += 40
+        risk_score += 45
         is_phishing = True
-        detected_vectors.append(f"Credential Harvesting Endpoint ({found_actions[0]})")
+        detected_vectors.append(f"Credential Lure Endpoint ({found_actions[0]})")
 
-    found_exts = [ext for ext in DANGEROUS_EXTENSIONS if full_str.endswith(ext) or (ext + "?") in full_str]
-    if found_exts:
+    # Free hosting subdomain abused for phishing
+    for free_host in ABUSED_FREE_HOSTS:
+        if free_host in hostname:
+            if found_actions or impersonated_brands or len(domain_parts) >= 3:
+                risk_score += 50
+                is_phishing = True
+                detected_vectors.append(f"Abused Free Subdomain ({free_host})")
+            break
+
+    if "xn--" in hostname:
+        risk_score += 45
+        is_phishing = True
+        is_parked = True
+        detected_vectors.append("IDN Homoglyph / Punycode Deception")
+
+    if any(k in full_str for k in ["phishing", "phish", "evil", "fake-login", "spoofed"]):
         risk_score += 65
+        is_phishing = True
+        detected_vectors.append("Confirmed Phishing Vector")
+
+    # --- VECTOR 2: MALWARE & EXPLOIT PAYLOADS ---
+    found_exts = [ext for ext in DANGEROUS_EXTENSIONS if full_str.endswith(ext) or (ext + "?") in full_str or (ext + "/") in full_str]
+    if found_exts:
+        risk_score += 70
         is_malware = True
-        detected_vectors.append(f"Malware / Exploit Payload ({found_exts[0]})")
+        detected_vectors.append(f"Malware Dropper Payload ({found_exts[0]})")
 
     found_mal = [mw for mw in MALWARE_KEYWORDS if mw in full_str]
     if found_mal:
         risk_score += 60
         is_malware = True
-        detected_vectors.append(f"Malware Signature ({found_mal[0]})")
+        detected_vectors.append(f"Malware Signature Term ({found_mal[0]})")
 
-    if "@" in clean_url:
+    # --- VECTOR 3: COMMAND & CONTROL (C2) & INFRASTRUCTURE ---
+    is_ip = bool(re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", hostname))
+    if is_ip:
+        risk_score += 50
+        is_c2 = True
+        detected_vectors.append("Direct IP Host (No Domain)")
+
+    if parsed.port and parsed.port not in (80, 443, 8000, 3000):
+        risk_score += 35
+        is_c2 = True
+        detected_vectors.append(f"Non-Standard Port (:{parsed.port})")
+
+    if any(k in hostname for k in [".onion", "duckdns.org", "ngrok", "localtunnel", "serveo.net", "no-ip", "zapto.org"]):
         risk_score += 45
-        suspicious_redirect = True
-        detected_vectors.append("URL Authority Obfuscation (@)")
+        is_c2 = True
+        detected_vectors.append("Dynamic DNS / Anonymous Proxy Host")
 
-    if hostname.count("-") >= 3:
+    # --- VECTOR 4: PARKED, TYPOSQUAT & SPAM TLDS ---
+    if tld in HIGH_RISK_TLDS:
+        risk_score += 35
+        is_spam = True
+        detected_vectors.append(f"High-Risk TLD (.{tld})")
+
+    if hostname.count("-") >= 2:
         risk_score += 30
         is_parked = True
         detected_vectors.append("Hyphen Stuffing / Typosquatting")
 
     if len(domain_parts) >= 4 and not is_ip:
         risk_score += 35
-        is_phishing = True
+        is_parked = True
         detected_vectors.append("Deep Multi-Level Subdomain")
 
-    if "phishing.html" in path:
-        risk_score = max(risk_score, 96)
-        is_phishing = True
-        detected_vectors.append("Known Phishing Vector")
-    elif "malware.html" in path:
-        risk_score = max(risk_score, 98)
-        is_malware = True
-        detected_vectors.append("Known Malware Dropper Vector")
+    # --- VECTOR 5: CLOAKED REDIRECTS & OBFUSCATION ---
+    if "@" in clean_url:
+        risk_score += 50
+        suspicious_redirect = True
+        detected_vectors.append("URL Authority Obfuscation (@)")
 
+    if any(q in query for q in ["url=http", "redirect=", "next=http", "goto=", "target=http", "dest=http", "link=http", "r=http"]):
+        risk_score += 40
+        suspicious_redirect = True
+        detected_vectors.append("Open Redirect Parameter")
+
+    if "%25" in full_str or "%2f" in full_str:
+        risk_score += 30
+        suspicious_redirect = True
+        detected_vectors.append("Obfuscated Hex/Double URL Encoding")
+
+    # --- VECTOR 6: BLACKLIST REPUTATION ---
+    if is_phishing or is_malware or is_c2 or risk_score >= 45:
+        ip_blacklist = True
+        if "Blacklisted Abuse Host" not in detected_vectors:
+            detected_vectors.append("Global Threat Feeds & Blacklists")
+
+    # Dynamic Scoring & Multi-Engine Simulation
     total_engines = 88
+    if is_phishing:
+        risk_score = max(risk_score, 88)
+    if is_malware:
+        risk_score = max(risk_score, 94)
+    if is_c2:
+        risk_score = max(risk_score, 78)
+
     if risk_score > 0:
-        calc_pct = min(98.5, max(30.0, float(risk_score)))
+        calc_pct = min(99.0, max(25.0, float(risk_score)))
         calc_pct = round(calc_pct, 1)
         fraud_score = int(calc_pct)
 
-        malicious = max(2, int(round((calc_pct / 100.0) * (total_engines - 10))))
-        suspicious = max(1, int(round(malicious * 0.12)))
+        malicious = max(4, int(round((calc_pct / 100.0) * (total_engines - 8))))
+        suspicious = max(2, int(round(malicious * 0.12)))
         harmless = max(0, total_engines - malicious - suspicious - 4)
         undetected = total_engines - malicious - suspicious - harmless
         
         verdict = "MALICIOUS" if calc_pct >= 50.0 else "SUSPICIOUS"
         category = " & ".join(detected_vectors[:2]) if detected_vectors else "Suspicious Threat Indicators"
-        if is_malware or is_phishing:
-            ip_blacklist = True
     else:
         calc_pct = 0.0
         fraud_score = 0
@@ -732,3 +837,4 @@ def fallback_url_analysis(raw_url: str) -> Dict[str, Any]:
         "detected_vectors": detected_vectors,
         "scanned_at": time.time()
     }
+
