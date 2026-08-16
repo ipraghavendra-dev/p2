@@ -31,7 +31,7 @@ SQLModel.metadata.create_all(engine)
 # Initialize FastAPI Application
 app = FastAPI(
     title="Hawk Threat Scanner API",
-    description="Multi-engine threat detection gateway with IPQS URL scanner, VirusTotal v3 and SQLite caching.",
+    description="Multi-engine threat detection gateway with real-time URL scanner, VirusTotal v3 and SQLite caching.",
     version="1.0.0"
 )
 

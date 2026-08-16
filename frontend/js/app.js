@@ -1,4 +1,4 @@
-// Hawk Threat Scanner - IPQS Cloned Frontend Controller
+// Hawk Threat Scanner - Frontend Controller
 const BACKEND_BASE = window.location.origin.includes('http') ? window.location.origin : 'http://127.0.0.1:8000';
 
 // Element Selectors
@@ -39,10 +39,11 @@ const maliciousCountText = document.getElementById('maliciousCountText');
 const domainStatusText = document.getElementById('domainStatusText');
 const copyHashBtn = document.getElementById('copyHashBtn');
 
-// IPQS Signal Matrix Section Hooks
+// Threat Signal Matrix Section Hooks
 const signalSectionIcon = document.getElementById('signalSectionIcon');
 const signalSectionTitle = document.getElementById('signalSectionTitle');
 const signalSectionSubtitle = document.getElementById('signalSectionSubtitle');
+
 
 const sigIcon1 = document.getElementById('sigIcon1');
 const sigTitle1 = document.getElementById('sigTitle1');
@@ -263,7 +264,8 @@ async function handleUrlScan(rawUrl) {
         return;
     }
 
-    toggleUIState(true, `Running IPQS forensic threat & blacklist checks on ${clean}...`);
+    toggleUIState(true, `Running deep forensic threat & blacklist checks on ${clean}...`);
+
 
     try {
         const response = await fetch(`${BACKEND_BASE}/scan/url`, {
@@ -394,11 +396,12 @@ function renderMetrics(payload, customTargetName = null, scanType = 'hash') {
     resTargetHash.setAttribute('data-full-val', targetVal);
 
     let sourceLabel = "Hawk Threat Engine";
-    if (source.includes("ipqs")) sourceLabel = "IPQS Cloned Engine";
-    else if (source.includes("virustotal")) sourceLabel = "🌐 VirusTotal v3";
+    if (source.includes("virustotal")) sourceLabel = "🌐 VirusTotal v3";
     else if (source.includes("signature")) sourceLabel = "🛡️ Signature Engine";
     else if (source.includes("file")) sourceLabel = "📁 Binary Analyzer";
+    else sourceLabel = "🦅 Hawk Threat Engine";
     resSourceBadge.innerText = sourceLabel;
+
 
     // Numerical & Gauge Breakdowns
     riskPctText.innerText = `${fraudScore}`;

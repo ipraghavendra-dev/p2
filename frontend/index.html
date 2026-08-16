@@ -41,7 +41,7 @@
         <!-- Hero Header -->
         <div class="text-center space-y-2 max-w-3xl mx-auto">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/60 border border-blue-800/50 text-blue-400 text-xs font-semibold mb-2">
-                <span>⚡ Real-Time IPQS Forensic Analysis</span>
+                <span>⚡ Real-Time Threat Forensics</span>
             </div>
             <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
                 Malicious URL & Threat Scanner
@@ -72,7 +72,7 @@
         <!-- Input Selector Section -->
         <section id="scannerInputs">
             
-            <!-- 1. IPQS Cloned Malicious Link / URL Scanner Panel -->
+            <!-- 1. Malicious Link / URL Scanner Panel -->
             <div id="urlSection" class="glass-panel rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-5">
                 <div>
                     <div class="flex items-center space-x-3 mb-2">
@@ -101,9 +101,9 @@
                     <!-- Quick Demo Sample URLs -->
                     <div class="mt-4 flex flex-wrap items-center gap-2">
                         <span class="text-[11px] font-semibold text-gray-500 mr-1">Quick Presets:</span>
-                        <button type="button" onclick="window.loadSampleUrl('https://www.ipqualityscore.com/threat-feeds/malicious-url-scanner')"
+                        <button type="button" onclick="window.loadSampleUrl('https://cloudflare.com')"
                                 class="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-blue-950/50 hover:bg-blue-900/60 text-blue-300 border border-blue-800/40 transition">
-                            🛡️ IPQS Scanner Page (Verified Safe)
+                            🛡️ Cloudflare (Verified Safe)
                         </button>
                         <button type="button" onclick="window.loadSampleUrl('http://testsafebrowsing.appspot.com/s/phishing.html')"
                                 class="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-red-950/50 hover:bg-red-900/60 text-red-300 border border-red-800/40 transition">
@@ -184,10 +184,10 @@
                 <div class="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-purple-500"></div>
                 <div class="absolute text-xl">🛡️</div>
             </div>
-            <p id="loaderText" class="text-sm text-gray-300 font-medium animate-pulse">Running IPQS forensic threat diagnostics, please hold...</p>
+            <p id="loaderText" class="text-sm text-gray-300 font-medium animate-pulse">Running deep forensic threat diagnostics, please hold...</p>
         </section>
 
-        <!-- Analysis Results Dashboard Panel (Cloned IPQS Feature Matrix) -->
+        <!-- Analysis Results Dashboard Panel (Threat Feature Matrix) -->
         <section id="resultsSection" class="hidden space-y-6">
             
             <!-- Result Summary Banner -->
@@ -206,9 +206,10 @@
                         </div>
                     </div>
                     <span id="resSourceBadge" class="text-xs self-start sm:self-center font-semibold bg-purple-950/80 text-purple-400 border border-purple-800/50 px-3.5 py-1.5 rounded-full shadow-inner">
-                        IPQS Cloned Engine
+                        Hawk Threat Engine
                     </span>
                 </div>
+
 
                 <!-- Main Risk & Fraud Gauge Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
@@ -258,8 +259,8 @@
                 </div>
             </div>
 
-            <!-- IPQS Threat Signal Matrix (Phishing, Malware, C2, Parked, Redirects, Blacklist) -->
-            <div id="ipqsSignalMatrix" class="glass-panel rounded-2xl p-6 space-y-4">
+            <!-- Threat Signal Matrix (Phishing, Malware, C2, Parked, Redirects, Blacklist) -->
+            <div id="threatSignalMatrix" class="glass-panel rounded-2xl p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-gray-800/80 pb-3">
                     <div class="flex items-center space-x-2">
                         <span class="text-lg" id="signalSectionIcon">🛡️</span>
@@ -267,6 +268,7 @@
                     </div>
                     <span class="text-xs text-gray-400" id="signalSectionSubtitle">Multi-Engine Signals</span>
                 </div>
+
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                     <!-- Signal 1 -->
@@ -344,7 +346,7 @@
             </div>
 
             <!-- Forensic Intelligence Breakdown -->
-            <div id="ipqsForensics" class="glass-panel rounded-2xl p-6 space-y-4">
+            <div id="forensicsSection" class="glass-panel rounded-2xl p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-gray-800/80 pb-3">
                     <div class="flex items-center space-x-2">
                         <span class="text-lg" id="forensicSectionIcon">🔍</span>
@@ -388,7 +390,7 @@
     <!-- Page Footer -->
     <footer class="border-t border-gray-900 bg-gray-950/90 py-5 text-center text-xs text-gray-500">
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <p>Hawk Threat Analytics Ecosystem &bull; IPQS Cloned Malicious URL Scanner</p>
+            <p>Hawk Threat Analytics Ecosystem &bull; Threat Intelligence & URL Scanner</p>
             <p class="text-gray-600">Forensics &bull; Phishing Engine &bull; Domain Reputation &bull; VirusTotal v3 Ready</p>
         </div>
     </footer>

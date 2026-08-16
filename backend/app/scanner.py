@@ -600,7 +600,7 @@ def resolve_ip_and_info(hostname: str) -> Dict[str, Any]:
 
 def fallback_url_analysis(raw_url: str) -> Dict[str, Any]:
     """
-    IPQualityScore (IPQS) Cloned Malicious URL Scanner Engine.
+    Hawk Malicious URL & Threat Intelligence Scanner Engine.
     Evaluates 6 comprehensive threat vectors: Phishing, Malware, C2, Parked/Typosquat, Cloaked Redirects, Blacklist.
     """
     clean_url = raw_url.strip()
@@ -627,12 +627,13 @@ def fallback_url_analysis(raw_url: str) -> Dict[str, Any]:
     if is_safe_whitelist:
         total = 90
         return {
-            "source": "ipqs_cloned_threat_engine",
+            "source": "hawk_threat_engine",
             "file_hash": clean_url,
             "file_name": clean_url,
             "domain": hostname,
             "risk_percentage": 0.0,
             "fraud_score": 0,
+
             "malicious_count": 0,
             "suspicious_count": 0,
             "harmless_count": 88,
@@ -810,9 +811,10 @@ def fallback_url_analysis(raw_url: str) -> Dict[str, Any]:
         category = "Benign Web Domain / Clean Signals"
 
     return {
-        "source": "ipqs_cloned_threat_engine",
+        "source": "hawk_threat_engine",
         "file_hash": clean_url,
         "file_name": clean_url,
+
         "domain": hostname,
         "risk_percentage": calc_pct,
         "fraud_score": fraud_score,

@@ -2,7 +2,7 @@
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB.svg?logo=python&logoColor=white)](https://python.org)
-[![Security](https://img.shields.io/badge/Security-IPQS%20%26%20VirusTotal%20v3-red.svg)](https://virustotal.com)
+[![Security](https://img.shields.io/badge/Security-Threat%20Intelligence%20%26%20VirusTotal%20v3-red.svg)](https://virustotal.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Link & Phishing Scanner: Analyzes submitted URLs to detect malicious domains and phishing attempts, assigning a risk score based on detected threats.
