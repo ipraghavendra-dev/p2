@@ -396,8 +396,8 @@ def health_check():
 
 @app.post("/scan/hash")
 @app.post("/api/scan/hash")
-async def scan_hash(payload: Optional[Dict[str, Any]] = Body(None), hash_value: Optional[str] = Query(None)):
-    """Direct lookup endpoint for cryptographic signature hashes (MD5, SHA-1, SHA-256)."""
+async def scan_hash(payload: Optional[Dict[str, Any]] = Body(None), hash_value: Optional[str] = Query(None), x_client_id: Optional[str] = Header(None, alias="X-Client-ID")):
+    """Validates and processes MD5, SHA-1, or SHA-256 hash queries."""
     target_hash = ""
     if payload:
         target_hash = payload.get("hash_value") or payload.get("hash") or ""
@@ -408,7 +408,7 @@ async def scan_hash(payload: Optional[Dict[str, Any]] = Body(None), hash_value: 
     if len(clean_hash) not in (32, 40, 64):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid hash length. Must be MD5 (32), SHA-1 (40), or SHA-256 (64) characters."
+            detail="Invalid hash length. Must be MD5 (32 chars), SHA-1 (40 chars), or SHA-256 (64 chars)."
         )
 
     if not all(c in "0123456789abcdef" for c in clean_hash):
@@ -417,13 +417,14 @@ async def scan_hash(payload: Optional[Dict[str, Any]] = Body(None), hash_value: 
             detail="Invalid hexadecimal character sequence in hash string."
         )
 
-    result = process_hash_query(clean_hash)
+    result = process_hash_query(clean_hash, client_id=x_client_id or "global")
     return result
+
 
 
 @app.post("/scan/url")
 @app.post("/api/scan/url")
-async def scan_url(payload: Optional[Dict[str, Any]] = Body(None), url: Optional[str] = Query(None)):
+async def scan_url(payload: Optional[Dict[str, Any]] = Body(None), url: Optional[str] = Query(None), x_client_id: Optional[str] = Header(None, alias="X-Client-ID")):
     """Inspects suspicious URLs/links and returns malicious percentage & security flags."""
     target_url = ""
     if payload:
@@ -438,13 +439,13 @@ async def scan_url(payload: Optional[Dict[str, Any]] = Body(None), url: Optional
             detail="Please provide a valid URL (e.g., https://example.com/login)."
         )
 
-    result = process_url_query(clean_url)
+    result = process_url_query(clean_url, client_id=x_client_id or "global")
     return result
 
 
 @app.post("/scan/file")
 @app.post("/api/scan/file")
-async def scan_file(file: UploadFile = File(...)):
+async def scan_file(file: UploadFile = File(...), x_client_id: Optional[str] = Header(None, alias="X-Client-ID")):
     """Accepts file uploads, inspects binary payload, hashes in memory, logs to database, and returns threat telemetry."""
     try:
         contents = await file.read()
@@ -452,20 +453,23 @@ async def scan_file(file: UploadFile = File(...)):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded file is empty (0 bytes).")
 
         result = evaluate_file_payload(contents, file.filename or "Uploaded_Artifact")
+        cid = x_client_id or "global"
         
-        # Save file scan into database so it is tracked in fresh activity logs
+        # Save file scan into database with user client_id isolation
         with Session(engine) as session:
             file_hash = result["file_hash"]
             cached = session.get(ThreatCache, file_hash)
             if cached:
                 cached.scanned_at = time.time()
                 cached.file_name = file.filename or cached.file_name
+                cached.client_id = cid
                 cached.engine_details = json.dumps(result)
                 session.add(cached)
             else:
                 new_cache = ThreatCache(
                     file_hash=file_hash,
                     file_name=file.filename or result["file_name"],
+                    client_id=cid,
                     risk_percentage=result["risk_percentage"],
                     malicious_count=result["malicious_count"],
                     suspicious_count=result["suspicious_count"],
@@ -496,24 +500,37 @@ async def scan_file(file: UploadFile = File(...)):
 
 @app.get("/api/recent")
 @app.get("/api/history")
-def get_recent_scans():
-    """Fetches recently scanned artifacts and links from the database with full refreshed telemetry."""
+def get_recent_scans(client_id: Optional[str] = Query(None), x_client_id: Optional[str] = Header(None, alias="X-Client-ID")):
+    """Fetches recently scanned artifacts and links for the specific client/user."""
+    cid = client_id or x_client_id
     with Session(engine) as session:
-        statement = select(ThreatCache).order_by(desc(ThreatCache.scanned_at)).limit(20)
+        if cid:
+            statement = select(ThreatCache).where((ThreatCache.client_id == cid) | (ThreatCache.client_id == "global")).order_by(desc(ThreatCache.scanned_at)).limit(30)
+        else:
+            statement = select(ThreatCache).order_by(desc(ThreatCache.scanned_at)).limit(30)
         results = session.exec(statement).all()
         formatted = [_format_cached_record(r) for r in results]
-        return {"scans": formatted, "count": len(formatted)}
+        return {"scans": formatted, "count": len(formatted), "client_id": cid}
 
 
 @app.post("/api/history/clear")
 @app.delete("/api/history")
-def clear_scan_history():
-    """Clears all scan history logs from the database."""
+def clear_scan_history(client_id: Optional[str] = Query(None), x_client_id: Optional[str] = Header(None, alias="X-Client-ID")):
+    """Clears scan history logs specifically for the requesting user/client."""
+    cid = client_id or x_client_id
     with Session(engine) as session:
-        for item in session.exec(select(ThreatCache)).all():
-            session.delete(item)
-        session.commit()
-    return {"status": "success", "message": "Scan history cleared."}
+        if cid:
+            items = session.exec(select(ThreatCache).where(ThreatCache.client_id == cid)).all()
+            for item in items:
+                session.delete(item)
+            session.commit()
+            return {"status": "success", "message": f"Scan history for client {cid} cleared."}
+        else:
+            for item in session.exec(select(ThreatCache)).all():
+                session.delete(item)
+            session.commit()
+            return {"status": "success", "message": "All scan history logs cleared."}
+
 
 
 

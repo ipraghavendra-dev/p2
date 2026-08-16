@@ -101,6 +101,10 @@ const forensicContentType = document.getElementById('forensicContentType');
 // SVG Circumference Constant (r = 58)
 const CIRCUMFERENCE = 2 * Math.PI * 58; // ~364.425
 
+// Persistent Client/User ID for User-Isolated History & Logs
+const CLIENT_ID = localStorage.getItem('hawk_client_id') || ('usr_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36));
+localStorage.setItem('hawk_client_id', CLIENT_ID);
+
 // Tab & Report State Management
 let currentActiveTab = 'url';
 const tabReports = {
@@ -109,6 +113,7 @@ const tabReports = {
     file: null
 };
 let lastLoadedReport = null;
+
 
 // Initialize Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -299,7 +304,10 @@ async function handleUrlScan(rawUrl) {
     try {
         const response = await fetch(`${BACKEND_BASE}/scan/url`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Client-ID': CLIENT_ID
+            },
             body: JSON.stringify({ url: clean })
         });
 
@@ -335,6 +343,9 @@ async function handleFileUpload(file) {
     try {
         const response = await fetch(`${BACKEND_BASE}/scan/file`, {
             method: 'POST',
+            headers: {
+                'X-Client-ID': CLIENT_ID
+            },
             body: formData
         });
 
@@ -369,7 +380,10 @@ async function handleHashLookup(hash) {
     try {
         const response = await fetch(`${BACKEND_BASE}/scan/hash`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Client-ID': CLIENT_ID
+            },
             body: JSON.stringify({ hash_value: clean })
         });
 
@@ -390,6 +404,27 @@ async function handleHashLookup(hash) {
         toggleUIState(false);
     }
 }
+
+// 4. Instant Sample File Generator & Testing Helper
+window.testSampleFile = function(sampleType) {
+    window.switchScannerTab('file');
+    let fileObj;
+    if (sampleType === 'eicar') {
+        const eicarStr = 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*';
+        const blob = new Blob([eicarStr], { type: 'application/octet-stream' });
+        fileObj = new File([blob], 'eicar_standard_test.com', { type: 'application/octet-stream' });
+    } else if (sampleType === 'apk_malware') {
+        const fakeApkBytes = new Uint8Array([0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x08, 0x00, 0x08, 0x00, 0x61, 0x6E, 0x64, 0x72, 0x6F, 0x69, 0x64]);
+        const blob = new Blob([fakeApkBytes], { type: 'application/vnd.android.package-archive' });
+        fileObj = new File([blob], 'banker_trojan_stealer.apk', { type: 'application/vnd.android.package-archive' });
+    } else {
+        const pdfContent = '%PDF-1.7\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] >>\nendobj\nxref\n0 4\n0000000000 65535 f\n0000000009 00000 n\n0000000058 00000 n\n0000000115 00000 n\ntrailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n190\n%%EOF';
+        const blob = new Blob([pdfContent], { type: 'application/pdf' });
+        fileObj = new File([blob], 'quarterly_security_audit.pdf', { type: 'application/pdf' });
+    }
+    handleFileUpload(fileObj);
+};
+
 
 // Set Signal Badge State
 function setSignalBadge(el, isThreat, threatLabel = 'Detected', cleanLabel = 'Clean') {
@@ -709,7 +744,9 @@ function detectScanType(scan) {
 
 window.fetchScanHistory = async function() {
     try {
-        const response = await fetch(`${BACKEND_BASE}/api/history`);
+        const response = await fetch(`${BACKEND_BASE}/api/history?client_id=${encodeURIComponent(CLIENT_ID)}`, {
+            headers: { 'X-Client-ID': CLIENT_ID }
+        });
         if (!response.ok) return;
         const res = await response.json();
         cachedScansList = res.scans || [];
@@ -738,17 +775,21 @@ window.filterHistory = function(filterType) {
 
 window.clearScanHistory = async function() {
     try {
-        const response = await fetch(`${BACKEND_BASE}/api/history/clear`, { method: 'POST' });
+        const response = await fetch(`${BACKEND_BASE}/api/history/clear?client_id=${encodeURIComponent(CLIENT_ID)}`, { 
+            method: 'POST',
+            headers: { 'X-Client-ID': CLIENT_ID }
+        });
         if (response.ok) {
             cachedScansList = [];
             renderScanHistory();
-            showToast('Scan history logs cleared.', 'info');
+            showToast('Your personal scan history logs have been cleared.', 'info');
         }
     } catch {
         cachedScansList = [];
         renderScanHistory();
     }
 };
+
 
 window.viewHistoryRecord = function(index) {
     const item = cachedScansList[index];

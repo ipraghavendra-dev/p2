@@ -7,6 +7,7 @@ class ThreatCache(SQLModel, table=True):
     """Database model for storing and caching threat scan results."""
     file_hash: str = Field(primary_key=True, index=True)
     file_name: Optional[str] = None
+    client_id: Optional[str] = Field(default="global", index=True)
     risk_percentage: float = 0.0
     malicious_count: int = 0
     suspicious_count: int = 0
@@ -17,6 +18,7 @@ class ThreatCache(SQLModel, table=True):
     threat_category: Optional[str] = "Undetected / Benign"
     engine_details: Optional[str] = None  # JSON string of vendor breakdown
     scanned_at: float = Field(default_factory=time.time)
+
 
 class HashScanRequest(BaseModel):
     """Payload schema for manual hash scanning."""

@@ -114,6 +114,54 @@ KNOWN_THREAT_SIGNATURES: Dict[str, Dict[str, Any]] = {
         "file_type": "Win32 PE32 EXE",
         "signals": { "is_malware": True, "is_ransomware": True, "is_trojan": False, "is_botnet": False, "is_packed": True, "is_blacklisted": True }
     },
+    # BlackCat / ALPHV Ransomware
+    "15340f1a6642d99bc686a51d1fe88db3d937fc53df64c0552bc6642953de41a5": {
+        "name": "Ransomware.Rust.BlackCat.ALPHV",
+        "malicious": 66, "suspicious": 1, "harmless": 0, "undetected": 3, "total": 70,
+        "category": "Ransomware / Rust Payload",
+        "file_type": "Rust Native Binary / PE32+",
+        "signals": { "is_malware": True, "is_ransomware": True, "is_trojan": False, "is_botnet": False, "is_packed": True, "is_blacklisted": True }
+    },
+    # Cobalt Strike Beacon
+    "4d01b17b686eefec933b47f4f66a27618991a03f4cf21d2a13e2f5b61bfa2fb4": {
+        "name": "CobaltStrike.Beacon.Stager",
+        "malicious": 68, "suspicious": 1, "harmless": 0, "undetected": 1, "total": 70,
+        "category": "C2 Infrastructure / Adversary Emulation",
+        "file_type": "Win32 DLL / Shellcode Stager",
+        "signals": { "is_malware": True, "is_ransomware": False, "is_trojan": True, "is_botnet": True, "is_packed": True, "is_blacklisted": True }
+    },
+    # QakBot / QBot Trojan
+    "c443213a8907dd2934ff24cf2deab8d58a5f822f3e8093d5964893708df6ad66": {
+        "name": "Trojan.Win32.QakBot.Payload",
+        "malicious": 65, "suspicious": 2, "harmless": 0, "undetected": 3, "total": 70,
+        "category": "Banking Trojan / Modular Backdoor",
+        "file_type": "Win32 PE32 DLL",
+        "signals": { "is_malware": True, "is_ransomware": False, "is_trojan": True, "is_botnet": True, "is_packed": True, "is_blacklisted": True }
+    },
+    # Lumma Information Stealer
+    "85848bb24da1c72f10b777a8355aa1a5472851ee78d6b823e2a22be587216a69": {
+        "name": "Trojan.Win32.LummaStealer",
+        "malicious": 67, "suspicious": 1, "harmless": 0, "undetected": 2, "total": 70,
+        "category": "InfoStealer / Credential Harvester",
+        "file_type": "Win32 Executable",
+        "signals": { "is_malware": True, "is_ransomware": False, "is_trojan": True, "is_botnet": False, "is_packed": True, "is_blacklisted": True }
+    },
+    # Stuxnet SCADA Worm
+    "3c09b68516d2cf2eef8e05c879d71c8ab75429ef9f7a7da9319e7a8585973950": {
+        "name": "Worm.Win32.Stuxnet.A",
+        "malicious": 69, "suspicious": 0, "harmless": 0, "undetected": 1, "total": 70,
+        "category": "SCADA Industrial Worm / APT Exploitation",
+        "file_type": "Win32 Driver / DLL",
+        "signals": { "is_malware": True, "is_ransomware": False, "is_trojan": True, "is_botnet": False, "is_packed": True, "is_blacklisted": True }
+    },
+    # Mimikatz Credential Dumper
+    "9efae54e76a666ad63d3509bc97ee0d381fcad90c9b0e3be5faec1cf1762c1da": {
+        "name": "HackTool.Win64.Mimikatz.Generic",
+        "malicious": 66, "suspicious": 1, "harmless": 0, "undetected": 3, "total": 70,
+        "category": "Credential Extraction / LSASS Dumper",
+        "file_type": "Win64 PE32+ Executable",
+        "signals": { "is_malware": True, "is_ransomware": False, "is_trojan": False, "is_botnet": False, "is_packed": False, "is_blacklisted": True }
+    },
     # AgentTesla Spyware
     "0c1c8751509176985a9bc83f080076648cb457636e051c518ad759b66a5a2ff2": {
         "name": "Trojan.Spy.AgentTesla",
@@ -130,6 +178,14 @@ KNOWN_THREAT_SIGNATURES: Dict[str, Dict[str, Any]] = {
         "file_type": "Win32 EXE / PE32",
         "signals": { "is_malware": True, "is_ransomware": False, "is_trojan": True, "is_botnet": True, "is_packed": True, "is_blacklisted": True }
     },
+    # Pegasus Spyware Payload
+    "8a29486c478a872cc4486518a41285cb0a29486c478a872cc4486518a41285cb": {
+        "name": "Spyware.iOS.Pegasus.Trident",
+        "malicious": 67, "suspicious": 1, "harmless": 0, "undetected": 2, "total": 70,
+        "category": "Zero-Click Kernel Exploit / Spyware",
+        "file_type": "Mach-O 64-bit Arm64 Binary",
+        "signals": { "is_malware": True, "is_ransomware": False, "is_trojan": True, "is_botnet": False, "is_packed": True, "is_blacklisted": True }
+    },
     # Clean / Benign System Files
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
         "name": "Empty_File_Zero_Bytes",
@@ -137,8 +193,16 @@ KNOWN_THREAT_SIGNATURES: Dict[str, Dict[str, Any]] = {
         "category": "Benign / Safe System File",
         "file_type": "Binary / Zero Bytes",
         "signals": { "is_malware": False, "is_ransomware": False, "is_trojan": False, "is_botnet": False, "is_packed": False, "is_blacklisted": False }
+    },
+    "a1b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0": {
+        "name": "Sample_Clean_Document.pdf",
+        "malicious": 0, "suspicious": 0, "harmless": 68, "undetected": 2, "total": 70,
+        "category": "Benign PDF Document",
+        "file_type": "PDF Document (v1.7)",
+        "signals": { "is_malware": False, "is_ransomware": False, "is_trojan": False, "is_botnet": False, "is_packed": False, "is_blacklisted": False }
     }
 }
+
 
 # High-Risk Suspicious Top-Level Domains (TLDs)
 HIGH_RISK_TLDS = {
